@@ -1,1 +1,221 @@
-hogehoge
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>hoge</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <style>
+    svg {
+      border: solid 5px #0011;
+    }
+  </style>
+</head>
+<section id="app">
+  <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" id="myGraph" @dblclick="svgClick">
+    <line-item v-for="item in edges" :line="item"></line-item>
+    <circ-item v-for="elem in circs" :circ="elem"></circ-item>
+    <text-item v-for="(elem,id) in circs" :elem="elem" :id="id"></text-item>
+  </svg>
+
+  <form id="form_addEdge">
+    <div>
+      <label for="v1">頂点1</label>
+      <select v-model="selected_v1" id="v1">
+        <option v-for="(val, key) in circs" v-bind:value="key">{{ key }}</option>
+      </select>
+    </div>
+    <div>
+      <label for="v2">頂点2</label>
+      <select v-model="selected_v2" id="v2">
+        <option v-for="(val, key) in circs" v-bind:value="key">{{ key }}</option>
+      </select>
+    </div>
+  </form>
+  <button id="button_addEdge" @click="addEdge">辺追加</button>
+
+  <article>
+    <h2>隣接行列A</h2>
+    <p>{{ str_admat }}</p>
+  </article>
+  <article>
+    <h2>次数行列T</h2>
+    <p>{{ str_degmat }}</p>
+  </article>
+  <article>
+    <h2>次数行列の平方逆数T^{-1/2}</h2>
+    <p>{{ str_isdegmat }}</p>
+  </article>
+</section>
+
+<script>
+  Vue.component("circ-item", {
+    props: ["circ"],
+    template: '<circle :cx="circ.x" :cy="circ.y" :r="circ.r" :fill="circ.fill" :stroke="circ.stroke" :stroke-width="circ.strokewidth" pointer-events=all @mousedown="circMouseDown" @mouseup="circMouseUp" />',
+    methods: {
+      circMouseMove: function (e) {
+        this.circ.x = e.offsetX;
+        this.circ.y = e.offsetY;
+      },
+      circMouseDown: function (e) {
+        document.addEventListener("mousemove", this.circMouseMove);
+      },
+      circMouseUp: function (e) {
+        document.removeEventListener("mousemove", this.circMouseMove);
+      }
+    }
+  })
+  Vue.component("text-item", {
+    props: ["elem", "id"],
+    template: '<text :x="elem.x" :y="elem.y" text-anchor="middle" dominant-baseline="central" pointer-events=none>{{ id }}</text>'
+  })
+
+  Vue.component("line-item", {
+    props: ["line"],
+    template: '<line :x1="line.x1" :y1="line.y1" :x2="line.x2" :y2="line.y2" stroke="black" stroke-width:3 />'
+  })
+
+  var app = new Vue({
+    el: "#app",
+    data: {
+      selected_v1: "",
+      selected_v2: "",
+      orders: 0,
+      pairs: [],
+      circs: {}
+    },
+    computed: {
+      edges: function () {
+        var lst = [];
+        for (var i = 0; i < this.pairs.length; i++) {
+          vs = this.pairs[i];
+          var v1id = vs["v1"];
+          var v2id = vs["v2"];
+          lst.push({
+            x1: this.circs[v1id]["x"],
+            y1: this.circs[v1id]["y"],
+            x2: this.circs[v2id]["x"],
+            y2: this.circs[v2id]["y"]
+          })
+        }
+        return lst
+      },
+      vs: function () {
+        return Object.keys(this.circs)
+      },
+      admat: function () {
+        var ret = new Array(this.vs.length);
+        for(var i=0; i<this.vs.length; i++) {
+          ret[i] = new Array(this.vs.length).fill(0);
+        }
+
+        for (var i=0; i<this.vs.length; i++) {
+          for (var j=0; j<this.vs.length; j++) {
+            var flg=false;
+            for (var k=0; k<this.pairs.length; k++) {
+              if ((this.vs[i]==this.pairs[k]["v1"] && this.vs[j]==this.pairs[k]["v2"]) || (this.vs[i]==this.pairs[k]["v2"] && this.vs[j]==this.pairs[k]["v1"])) {
+                flg = true;
+                break;
+              }
+            }
+            if (flg)
+              ret[i][j] = 1;
+            else
+              ret[i][j] = 0;
+          }
+        }
+        return ret
+      },
+      degmat: function () {
+        var ret = new Array(this.vs.length);
+        for(var i=0; i<this.vs.length; i++) {
+          ret[i] = new Array(this.vs.length).fill(0);
+          var s = 0;
+          for (var j=0; j<this.vs.length; j++) {
+            s += this.admat[i][j];
+          }
+          ret[i][i] = s;
+        }
+        return ret
+      },
+      isdegmat: function () {
+        var ret = new Array(this.vs.length);
+        for(var i=0; i<this.vs.length; i++) {
+          ret[i] = new Array(this.vs.length).fill(0);
+          
+          if (this.degmat[i][i] > 0)
+            ret[i][i] = 1/Math.sqrt(parseFloat(this.degmat[i][i]));
+          else
+            ret[i][i] = 0;
+        }
+        return ret
+      },
+      str_admat: function () {
+        var ret = "";
+        for (var i=0; i<this.vs.length; i++) {
+          for (var j=0; j<this.vs.length; j++) {
+            ret += String(this.admat[i][j]);
+            if (j<this.vs.length-1)
+              ret += " ";
+            else if (i<this.vs.length-1)
+              ret +=";\n\t";
+          }
+        }
+        return "[\n\t" + ret + "\n]"
+      },
+      str_degmat: function () {
+        var ret = "";
+        for (var i=0; i<this.vs.length; i++) {
+          for (var j=0; j<this.vs.length; j++) {
+            ret += String(this.degmat[i][j]);
+            if (j<this.vs.length-1)
+              ret += " ";
+            else if (i<this.vs.length-1)
+              ret +=";\n\t";
+          }
+        }
+        return "[\n\t" + ret + "\n]"
+      },
+      str_isdegmat: function () {
+        var ret = "";
+        for (var i=0; i<this.vs.length; i++) {
+          for (var j=0; j<this.vs.length; j++) {
+            ret += String(this.isdegmat[i][j]);
+            if (j<this.vs.length-1)
+              ret += " ";
+            else if (i<this.vs.length-1)
+              ret +=";\n\t";
+          }
+        }
+        return "[\n\t" + ret + "\n]"
+      }
+    },
+    methods: {
+      addEdge: function (e) {
+        var flg = true;
+        for (var i = 0; i < this.pairs.length; i++) {
+          if ((this.pairs[i].v1 == this.selected_v1 && this.pairs[i].v2 == this.selected_v2) || (this.pairs[i].v1 == this.selected_v2 && this.pairs[i].v2 == this.selected_v1)) {
+            flg = false;
+            break;
+          }
+        }
+        if (this.selected_v1 != this.selected_v2 && flg) {
+          this.pairs.push({
+            v1: this.selected_v1,
+            v2: this.selected_v2
+          })
+        }
+      },
+      svgClick: function (e) {
+        this.$set(
+          this.circs,
+          String(this.orders),
+          { x: e.offsetX, y: e.offsetY, r: 30, fill: "white", stroke: "black", strokewidth: 3 }
+        );
+        this.orders++;
+      }
+    }
+  })
+</script>
+
+</html>
