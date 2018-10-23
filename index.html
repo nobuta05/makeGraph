@@ -5,6 +5,8 @@
   <meta charset="utf-8">
   <title>hoge</title>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script type="text/javascript" src="config.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
   <style>
     svg {
       border: solid 5px #0011;
@@ -20,13 +22,13 @@
 
   <form id="form_addEdge">
     <div>
-      <label for="v1">頂点1</label>
+      <label for="v1">頂点$1$</label>
       <select v-model="selected_v1" id="v1">
         <option v-for="(val, key) in circs" v-bind:value="key">{{ key }}</option>
       </select>
     </div>
     <div>
-      <label for="v2">頂点2</label>
+      <label for="v2">頂点$2$</label>
       <select v-model="selected_v2" id="v2">
         <option v-for="(val, key) in circs" v-bind:value="key">{{ key }}</option>
       </select>
@@ -35,15 +37,15 @@
   <button id="button_addEdge" @click="addEdge">辺追加</button>
 
   <article>
-    <h2>隣接行列A</h2>
+    <h2>隣接行列 $A$</h2>
     <p>{{ str_admat }}</p>
   </article>
   <article>
-    <h2>次数行列T</h2>
+    <h2>次数行列 $T$</h2>
     <p>{{ str_degmat }}</p>
   </article>
   <article>
-    <h2>次数行列の平方逆数T^{-1/2}</h2>
+    <h2>次数行列の平方逆数 $T^{-\frac{1}{2}}$</h2>
     <p>{{ str_isdegmat }}</p>
   </article>
 </section>
