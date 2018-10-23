@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>hoge</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+      svg {
+        border: solid 5px #0011;
+      }
+    </style>
+  </head>
+
+  <section id="app">
+    <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" id="myGraph">
+      <line x1="150" y1="220" x2="350" y2="220" stroke="black" stroke-width="3" />
+      <circ-item v-for="item in circs" v-bind:circ="item"></circ-item>
+    </svg>
+    
+  </section>
+
+  <script>
+    Vue.component("circ-item", {
+      props: ["circ"],
+      data: function() {
+        return {
+          x: this.circ.x,
+          y: this.circ.y,
+          r: this.circ.r,
+          fill: this.circ.fill,
+          stroke: this.circ.stroke,
+          strokewidth: this.circ.strokewidth
+        }
+      },
+      methods: {
+        circMouseMove: function(e) {
+          this.x = e.offsetX;
+          this.y = e.offsetY;
+        },
+        circMouseDown: function(e) {
+          document.addEventListener("mousemove", this.circMouseMove);
+        },
+        circMouseUp: function(e) {
+          document.removeEventListener("mousemove", this.circMouseMove);
+        }
+      },
+      template: '<circle :cx="x" :cy="y" :r="r" :fill="fill" :stroke="stroke" :stroke-width="strokewidth" pointer-events=all @mousedown="circMouseDown" @mouseup="circMouseUp" />'
+    })
+    
+
+    var app = new Vue({
+      el: "#app",
+      data: {
+        circs: [
+          {
+            x: 150,
+            y: 220,
+            r: 50,
+            fill: "white",
+            stroke: "black",
+            strokewidth: 3
+          },
+          {
+            x: 350,
+            y: 220,
+            r: 50,
+            fill: "white",
+            stroke: "black",
+            strokewidth: 3
+          }
+        ]
+      }
+    })
+  </script>
+</html>

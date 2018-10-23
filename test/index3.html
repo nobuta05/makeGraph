@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>hoge</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+      svg {
+        border: solid 5px #0011;
+      }
+    </style>
+  </head>
+
+  <article id="app">
+    <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" id="myGraph">
+      <circle v-for="item in circs" :cx="item.x" :cy="item.y" :r="item.r" :fill="item.fill" :stroke="item.stroke" :stroke-width="item.strokewidth" pointer-events=all onclick="myfunc()" />
+    </svg>
+  </article>
+
+  <script>
+    myfunc = function() {
+      console.log("MouseDown(circle)");
+    }
+
+    var app = new Vue({
+      el: "#app",
+      data: {
+        circs: [
+          {
+            x: 120,
+            y: 200,
+            r: 30,
+            fill: "none",
+            stroke: "black",
+            strokewidth: 3
+          }
+        ]
+      }
+    })
+
+  </script>
+</html>

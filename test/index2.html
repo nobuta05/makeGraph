@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>hoge</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <style>
+    svg {
+        border: solid 5px #0011;
+      }
+    </style>
+</head>
+
+<section id="app">
+  <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" id="myGraph" @mouseenter="svgMouseEnter"
+    @mouseleave="svgMouseLeave" @click="svgClick">
+    <circle v-if="viewcirc.flg" :cx="viewcirc.x" :cy="viewcirc.y" :r="viewcirc.r" :fill="viewcirc.fill" :stroke="viewcirc.stroke"
+      :stroke-width="viewcirc.strokewidth" />
+    <circ-item v-for="item in circs" v-bind:circ="item"></circ-item>
+  </svg>
+  <input type="checkbox" id="checkbox" v-model="checked">
+</section>
+
+<script>
+  Vue.component('circ-item', {
+    props: ['circ'],
+    template: '<circle :cx="circ.x" :cy="circ.y" :r="circ.r" :fill="circ.fill" :stroke="circ.stroke" :stroke-width="circ.strokewidth" />'
+  })
+
+  var app = new Vue({
+    el: "#app",
+    data: {
+      checked: true,
+      viewcirc: {
+        flg: false,
+        x: 0,
+        y: 0,
+        r: 5,
+        fill: "none",
+        stroke: "lightgray",
+        strokewidth: 3
+      },
+      circs: [
+        { x: 120, y: 220, r: 30, fill: "none", stroke: "black", strokewidth: 3 }
+      ]
+    },
+    methods: {
+      svgMouseMove: function (e) {
+        this.viewcirc.x = e.offsetX;
+        this.viewcirc.y = e.offsetY;
+      },
+      svgMouseEnter: function () {
+        if (this.checked) {
+          this.viewcirc.flg = true;
+          document.addEventListener("mousemove", this.svgMouseMove);
+        }
+      },
+      svgMouseLeave: function () {
+        if (this.checked) {
+          this.viewcirc.flg = false
+          document.removeEventListener("mousemove", this.svgMouseMove);
+        }
+
+      },
+      svgClick: function (e) {
+        if (this.checked) {
+          this.circs.push({
+            x: e.offsetX,
+            y: e.offsetY,
+            r: 30,
+            fill: "none",
+            stroke: "black",
+            strokewidth: 3
+          })
+        }
+      }
+    }
+  })
+</script>
+
+</html>

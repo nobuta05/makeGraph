@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>hoge</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <section id="app">
+    <article>
+      <h1>頂点追加</h1>
+      <form id="form_addVertex">
+        <div>
+          <label for="x_coord">中心のx座標</label>
+          <input v-model="var_x_coord" type="number" id="x_coord" min="0" max="600">
+        </div>
+        <div>
+          <label for="y_coord">中心のy座標</label>
+          <input v-model="var_y_coord" type="number" id="y_coord" min="0" max="600">
+        </div>
+      </form>
+      <button id="button_addVertex" v-on:click="addVertex">頂点追加</button>
+
+      <p>入力座標：({{ var_x_coord }}, {{ var_y_coord }})</p>
+
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" id="myGraph">
+        <circle :cx="var_x_coord" :cy="var_y_coord" r="50" fill="none" stroke="lightgray" stroke-width="5" />
+        <circ-item v-for="item in lst" v-bind:circ="item"></circ-item>
+      </svg>
+    </article>
+  </section>
+
+  <script>
+    Vue.component('circ-item', {
+      props: ['circ'],
+      template: '<circle :cx="circ.x" :cy="circ.y" r="50" fill="none" stroke="black" stroke-width="5" />'
+    })
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        var_x_coord: '100',
+        var_y_coord: '100',
+        lst: [
+          {
+            x: 120,
+            y: 150
+          },
+          {
+            x: 220,
+            y: 220
+          },
+          {
+            x: 450,
+            y: 300
+          }
+        ]
+      },
+      methods: {
+        addVertex: function (){
+          this.lst.push({
+            x:this.var_x_coord,
+            y:this.var_y_coord
+          })
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

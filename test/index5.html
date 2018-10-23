@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>hoge</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <style>
+    svg {
+      border: solid 5px #0011;
+    }
+  </style>
+</head>
+<section id="app">
+  <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" id="myGraph">
+    <line-item v-for="item in edges" v-bind:line="item"></line-item>
+    <circ-item v-for="item in circs" v-bind:circ="item"></circ-item>
+  </svg>
+
+  <form id="form_addEdge">
+    <div>
+      <label for="v1">頂点1</label>
+      <select v-model="selected_v1" id="v1">
+        <option v-for="(val, key) in circs" v-bind:value="key">{{ key }}</option>
+      </select>
+    </div>
+    <div>
+      <label for="v2">頂点2</label>
+      <select v-model="selected_v2" id="v2">
+        <option v-for="(val, key) in circs" v-bind:value="key">{{ key }}</option>
+      </select>
+    </div>
+  </form>
+  <button id="button_addEdge" @click="addEdge">辺追加</button>
+</section>
+
+<script>
+  Vue.component("circ-item", {
+    props: ["circ"],
+    template: '<circle :cx="circ.x" :cy="circ.y" :r="circ.r" :fill="circ.fill" :stroke="circ.stroke" :stroke-width="circ.strokewidth" pointer-events=all />'
+  })
+  Vue.component("line-item", {
+    props: ["line"],
+    template: '<line :x1="line.x1" :y1="line.y1" :x2="line.x2" :y2="line.y2" stroke="black" stroke-width:3 />'
+  })
+
+  var app = new Vue({
+    el: "#app",
+    data: {
+      selected_v1: "",
+      selected_v2: "",
+      orders: 3,
+      pairs: [],
+      circs: {
+        "0": {x: 130, y: 200, r: 30, fill: "white", stroke: "black", strokewidth: 3},
+        "1": {x: 300, y: 250, r: 50, fill: "white", stroke: "black", strokewidth: 3},
+        "2": {x: 250, y: 100, r: 30, fill: "white", stroke: "black", strokewidth: 3}
+      }
+    },
+    computed: {
+      edges: function (){
+        lst=[];
+        for(var i=0; i<this.pairs.length; i++) {
+          vs = this.pairs[i];
+          v1id = vs["v1"];
+          v2id = vs["v2"];
+          lst.push({
+            x1: this.circs[v1id]["x"],
+            y1: this.circs[v1id]["y"],
+            x2: this.circs[v2id]["x"],
+            y2: this.circs[v2id]["y"]
+          })
+        }
+        return lst
+      }
+    },
+    methods: {
+      addEdge: function (e) {
+        var flg = true;
+        for (var i=0; i<this.pairs.length; i++) {
+          if ( (this.pairs[i].v1 == this.selected_v1 && this.pairs[i].v2 == this.selected_v2) || (this.pairs[i].v1 == this.selected_v2 && this.pairs[i].v2 == this.selected_v1) ) {
+            flg = false;
+            break;
+          }
+        }
+        if (this.selected_v1 != this.selected_v2 && flg) {
+          this.pairs.push({
+            v1: this.selected_v1,
+            v2: this.selected_v2
+          })
+        }
+
+      }
+    }
+  })
+</script>
+
+</html>
