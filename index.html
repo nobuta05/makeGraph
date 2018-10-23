@@ -14,6 +14,13 @@
   </style>
 </head>
 <section id="app">
+  <h1>隣接行列等生成ツール</h1>
+  <p>枠内にグラフを描画すると，それに対応する隣接行列 $A$ ，次数行列 $T$ ，それの平行逆数行列 $T^{-1/2}$ を表示してくれるツール</p>
+  <ul>
+    <li>枠内でダブルクリックするとそこに頂点を描画</li>
+    <li>頂点1,2に，枠内の頂点に対応する番号を指定して『辺追加』ボタンを押すと，辺を追加し行列の情報を更新</li>
+  </ul>
+
   <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" id="myGraph" @dblclick="svgClick">
     <line-item v-for="item in edges" :line="item"></line-item>
     <circ-item v-for="elem in circs" :circ="elem"></circ-item>
@@ -107,15 +114,15 @@
       },
       admat: function () {
         var ret = new Array(this.vs.length);
-        for(var i=0; i<this.vs.length; i++) {
+        for (var i = 0; i < this.vs.length; i++) {
           ret[i] = new Array(this.vs.length).fill(0);
         }
 
-        for (var i=0; i<this.vs.length; i++) {
-          for (var j=0; j<this.vs.length; j++) {
-            var flg=false;
-            for (var k=0; k<this.pairs.length; k++) {
-              if ((this.vs[i]==this.pairs[k]["v1"] && this.vs[j]==this.pairs[k]["v2"]) || (this.vs[i]==this.pairs[k]["v2"] && this.vs[j]==this.pairs[k]["v1"])) {
+        for (var i = 0; i < this.vs.length; i++) {
+          for (var j = 0; j < this.vs.length; j++) {
+            var flg = false;
+            for (var k = 0; k < this.pairs.length; k++) {
+              if ((this.vs[i] == this.pairs[k]["v1"] && this.vs[j] == this.pairs[k]["v2"]) || (this.vs[i] == this.pairs[k]["v2"] && this.vs[j] == this.pairs[k]["v1"])) {
                 flg = true;
                 break;
               }
@@ -130,10 +137,10 @@
       },
       degmat: function () {
         var ret = new Array(this.vs.length);
-        for(var i=0; i<this.vs.length; i++) {
+        for (var i = 0; i < this.vs.length; i++) {
           ret[i] = new Array(this.vs.length).fill(0);
           var s = 0;
-          for (var j=0; j<this.vs.length; j++) {
+          for (var j = 0; j < this.vs.length; j++) {
             s += this.admat[i][j];
           }
           ret[i][i] = s;
@@ -142,11 +149,11 @@
       },
       isdegmat: function () {
         var ret = new Array(this.vs.length);
-        for(var i=0; i<this.vs.length; i++) {
+        for (var i = 0; i < this.vs.length; i++) {
           ret[i] = new Array(this.vs.length).fill(0);
-          
+
           if (this.degmat[i][i] > 0)
-            ret[i][i] = 1/Math.sqrt(parseFloat(this.degmat[i][i]));
+            ret[i][i] = 1 / Math.sqrt(parseFloat(this.degmat[i][i]));
           else
             ret[i][i] = 0;
         }
@@ -154,39 +161,39 @@
       },
       str_admat: function () {
         var ret = "";
-        for (var i=0; i<this.vs.length; i++) {
-          for (var j=0; j<this.vs.length; j++) {
+        for (var i = 0; i < this.vs.length; i++) {
+          for (var j = 0; j < this.vs.length; j++) {
             ret += String(this.admat[i][j]);
-            if (j<this.vs.length-1)
+            if (j < this.vs.length - 1)
               ret += " ";
-            else if (i<this.vs.length-1)
-              ret +=";\n\t";
+            else if (i < this.vs.length - 1)
+              ret += ";\n\t";
           }
         }
         return "[\n\t" + ret + "\n]"
       },
       str_degmat: function () {
         var ret = "";
-        for (var i=0; i<this.vs.length; i++) {
-          for (var j=0; j<this.vs.length; j++) {
+        for (var i = 0; i < this.vs.length; i++) {
+          for (var j = 0; j < this.vs.length; j++) {
             ret += String(this.degmat[i][j]);
-            if (j<this.vs.length-1)
+            if (j < this.vs.length - 1)
               ret += " ";
-            else if (i<this.vs.length-1)
-              ret +=";\n\t";
+            else if (i < this.vs.length - 1)
+              ret += ";\n\t";
           }
         }
         return "[\n\t" + ret + "\n]"
       },
       str_isdegmat: function () {
         var ret = "";
-        for (var i=0; i<this.vs.length; i++) {
-          for (var j=0; j<this.vs.length; j++) {
+        for (var i = 0; i < this.vs.length; i++) {
+          for (var j = 0; j < this.vs.length; j++) {
             ret += String(this.isdegmat[i][j]);
-            if (j<this.vs.length-1)
+            if (j < this.vs.length - 1)
               ret += " ";
-            else if (i<this.vs.length-1)
-              ret +=";\n\t";
+            else if (i < this.vs.length - 1)
+              ret += ";\n\t";
           }
         }
         return "[\n\t" + ret + "\n]"
